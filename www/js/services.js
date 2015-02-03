@@ -1,8 +1,6 @@
 angular.module('starter.services', ['http-auth-interceptor'])
 .factory('AuthenticationService', function($rootScope, $http, $q, authService, $httpBackend, $location) {
-  var baseUrl = 'http://192.168.1.10';
   var baseUrl = 'http://localhost';
-  //var baseUrl = 'http://axis.moolah.co.in';
   var loginEndpoint       = baseUrl +'/drupalionic/user/login';
   var logoutEndpoint       = baseUrl +'/drupalionic/user/logout';
   var token = localStorage.getItem('token') || '';
