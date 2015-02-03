@@ -1,6 +1,8 @@
 # drupalionic
 A framework for ionic mobile apps with drupal backend.
+
 <img src="icon.png" \>
+
 Dependencies:
 
 1. ionic
