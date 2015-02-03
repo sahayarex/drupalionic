@@ -1,0 +1,28 @@
+ion-nav-view {
+	background-color: #FFFFFF;
+}
+.angular-center-container {
+	position: relative;
+	top:50px;
+	left:0;
+	height:100%;
+	width:100%;
+	display:table;
+	z-index:9999;
+}
+.centered {
+	text-align: center;
+}
+.break-overflow {
+ 	white-space: normal;
+}
+.no-border-top {
+	border-top: 0 none;
+}
+.item.item-image {
+	border-top: 0 none;
+	border-bottom: 0 none;
+}
+.list.card {
+	margin-top: 10px;
+}

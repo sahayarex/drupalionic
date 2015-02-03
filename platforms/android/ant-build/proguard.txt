@@ -1,0 +1,6 @@
+# view AndroidManifest.xml #generated:6
+-keep class com.nts.drupalionic.drupalionic { <init>(...); }
+
+# view AndroidManifest.xml #generated:12
+-keep class com.synconset.MultiImageChooserActivity { <init>(...); }
+

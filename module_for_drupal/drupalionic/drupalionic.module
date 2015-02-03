@@ -1,0 +1,324 @@
+<?php
+function drupalionic_init() {
+  $node = node_load(15);
+  $images = array();
+  if(count($node->field_di_image['und']) > 0) {
+    foreach ($node->field_di_image['und'] as $key => $image) {
+      $images[]['image'] = file_create_url($image['uri']);
+    }
+  }
+}
+/**
+ * @file
+ * A module to provide a bridge between Drupal websites and Ionic mobile
+ * applications.
+ */
+
+/**
+ * Implements hook_help().
+ */
+function drupalionic_help($path, $arg) {
+  switch ($path) {
+    case 'admin/help#drupalionic':
+      // Show documentation URL.
+      $doc_msg = t('A module to provide a bridge between Drupal websites and Ionic mobile applications');
+      return "<p>$doc_msg</p>";
+      break;
+  }
+}
+
+/**
+ * Implements hook_permission().
+ */
+function drupalionic_permission() {
+  return array(
+    'administer drupalionic' => array(
+      'title' => t('Administer DrupalIonic'),
+      'description' => t('Perform administration tasks for DrupalIonic.'),
+    ),
+  );
+}
+
+/**
+ * Implements hook_menu().
+ */
+function drupalionic_menu() {
+  $items = array();
+  $items['save-photo'] = array(
+    'title' => 'save photo',
+    'page callback' => 'drupalionic_save_photo',
+    'access callback' => TRUE,
+  );  
+  return $items;
+}
+
+/**
+ * Implements hook_views_api().
+ */
+function drupalionic_views_api() {
+  return array(
+    'api' => 3,
+    'path' => drupal_get_path('module', 'drupalionic'),
+  );
+}
+
+/**
+ * Implements hook_ctools_plugin_api().
+ */
+function drupalionic_ctools_plugin_api($owner, $api) {
+  if ($owner == 'services' && $api == 'services') {
+    return array(
+      'version' => 3,
+      'file' => 'drupalionic.services.inc',
+    );
+  }
+}
+
+/**
+* Implements hook_entity_info_alter().
+*/
+function drupalionic_entity_info_alter(&$entity_info) {
+  // Add a DrupalIonic view mode to nodes and users.
+  $entity_info['node']['view modes']['drupalionic'] = array(
+    'label' => t('DrupalIonic'),
+    'custom settings' => TRUE
+  );
+  $entity_info['user']['view modes']['drupalionic'] = array(
+    'label' => t('DrupalIonic'),
+    'custom settings' => TRUE
+  );
+}
+
+/**
+ * Implements hook_default_services_endpoint().
+ */
+function drupalionic_default_services_endpoint() {
+  $endpoints = array();
+  $endpoint = new stdClass();
+  $endpoint->disabled = FALSE; /* Edit this to true to make a default endpoint disabled initially */
+  $endpoint->api_version = 3;
+  $endpoint->name = 'drupalionic';
+  $endpoint->server = 'rest_server';
+  $endpoint->path = 'drupalionic';
+  $endpoint->authentication = array(
+    'services' => 'services',
+  );
+  $endpoint->server_settings = array(
+    'formatters' => array(
+      'json' => TRUE,
+      'bencode' => FALSE,
+      'jsonp' => FALSE,
+      'php' => FALSE,
+      'rss' => FALSE,
+      'xml' => FALSE,
+    ),
+    'parsers' => array(
+      'application/json' => TRUE,
+      'application/x-www-form-urlencoded' => TRUE,
+      'application/xml' => TRUE,
+      'multipart/form-data' => TRUE,
+      'application/vnd.php.serialized' => FALSE,
+      'text/xml' => FALSE,
+    ),
+  );
+  $endpoint->resources = array(
+    'drupalionic_resources' => array(
+      'actions' => array(
+        'get_nodes' => array(
+          'enabled' => '1',
+        ),
+        'custom_node_save' => array(
+          'enabled' => '1',
+        ),
+        'custom_node_delete' => array(
+          'enabled' => '1',
+        ),
+      ),
+    ),
+    'file' => array(
+      'operations' => array(
+        'create' => array(
+          'enabled' => '1',
+        ),
+        'retrieve' => array(
+          'enabled' => '1',
+        ),
+        'delete' => array(
+          'enabled' => '1',
+        ),
+        'index' => array(
+          'enabled' => '1',
+        ),
+      ),
+      'actions' => array(
+        'create_raw' => array(
+          'enabled' => '1',
+        ),
+      ),
+    ),
+    'node' => array(
+      'operations' => array(
+        'retrieve' => array(
+          'enabled' => '1',
+        ),
+        'create' => array(
+          'enabled' => '1',
+        ),
+        'update' => array(
+          'enabled' => '1',
+        ),
+        'delete' => array(
+          'enabled' => '1',
+        ),
+        'index' => array(
+          'enabled' => '1',
+        ),
+      ),
+      'relationships' => array(
+        'files' => array(
+          'enabled' => '1',
+        ),
+      ),
+      'targeted_actions' => array(
+        'attach_file' => array(
+          'enabled' => '1',
+        ),
+      ),
+    ),
+    'system' => array(
+      'actions' => array(
+        'connect' => array(
+          'enabled' => '1',
+        ),
+        'get_variable' => array(
+          'enabled' => '1',
+        ),
+        'set_variable' => array(
+          'enabled' => '1',
+        ),
+        'del_variable' => array(
+          'enabled' => '1',
+        ),
+      ),
+    ),
+    'taxonomy_term' => array(
+      'operations' => array(
+        'retrieve' => array(
+          'enabled' => '1',
+        ),
+        'create' => array(
+          'enabled' => '1',
+        ),
+        'update' => array(
+          'enabled' => '1',
+        ),
+        'delete' => array(
+          'enabled' => '1',
+        ),
+        'index' => array(
+          'enabled' => '1',
+        ),
+      ),
+      'actions' => array(
+        'selectNodes' => array(
+          'enabled' => '1',
+        ),
+      ),
+    ),
+    'taxonomy_vocabulary' => array(
+      'operations' => array(
+        'retrieve' => array(
+          'enabled' => '1',
+        ),
+        'create' => array(
+          'enabled' => '1',
+        ),
+        'update' => array(
+          'enabled' => '1',
+        ),
+        'delete' => array(
+          'enabled' => '1',
+        ),
+        'index' => array(
+          'enabled' => '1',
+        ),
+      ),
+      'actions' => array(
+        'getTree' => array(
+          'enabled' => '1',
+        ),
+      ),
+    ),
+    'user' => array(
+      'operations' => array(
+        'retrieve' => array(
+          'enabled' => '1',
+        ),
+        'create' => array(
+          'enabled' => '1',
+        ),
+        'update' => array(
+          'enabled' => '1',
+        ),
+        'delete' => array(
+          'enabled' => '1',
+        ),
+        'index' => array(
+          'enabled' => '1',
+        ),
+      ),
+      'actions' => array(
+        'login' => array(
+          'enabled' => '1',
+        ),
+        'logout' => array(
+          'enabled' => '1',
+        ),
+        'token' => array(
+          'enabled' => '1',
+        ),
+        'register' => array(
+          'enabled' => '1',
+        ),
+      ),
+      'targeted_actions' => array(
+        'cancel' => array(
+          'enabled' => '1',
+        ),
+        'password_reset' => array(
+          'enabled' => '1',
+        ),
+        'resend_welcome_email' => array(
+          'enabled' => '1',
+        ),
+      ),
+    ),
+  );
+  $endpoint->debug = 0;
+  $endpoints[] = $endpoint;
+
+  return $endpoints;
+}
+
+function drupalionic_save_photo() {
+  variable_set('test_FILES', $_FILES);
+  variable_set('test_POST', $_POST);
+  if (!$_FILES["mobile"]["error"]){
+    //Get the uploaded file from the temp directory.            
+    $image = file_get_contents($_FILES['mobile']['tmp_name']);
+    $filename = date('Y_m_d_H_i_s', time())."_". $_FILES['mobile']['name'] .".jpeg";
+    //Saves a file to the specified destination and creates a database entry.
+    $file = file_save_data($image, 'public://'.$filename, FILE_EXISTS_RENAME);
+
+    //Set the file status to permanent so it is not deleted in next cron run
+    $file->status = FILE_STATUS_PERMANENT;
+    file_save($file);
+    return drupal_json_output($file->fid);
+  } else {
+    return 'ok';
+  }
+};
+
+function drupalionic_node_presave($node) {
+    drupal_set_message('<pre>this : '.print_r($node, 1).'</pre>');
+}

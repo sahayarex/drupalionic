@@ -1,0 +1,99 @@
+<?php
+
+/**
+ * Implements hook_install().
+ */
+function drupalionic_install() {
+  	//Create drupalionic content type
+  	$type = array(
+      'type' => 'drupalionic',
+      'name' => 'DrupalIonic',
+      'base' => 'node_content',
+      'description' => "Custom content type for the demo of drupalionic.",
+      'custom' => 1,
+      'modified' => 1,
+      'locked' => 0,
+    );
+	$type = node_type_set_defaults($type);
+	node_type_save($type);
+	node_add_body_field($type);
+
+  	//Create image field
+	$field_name = 'field_di_image';
+
+	//  Verify the field does not already exist.
+	if ( field_info_field( $field_name ) ) {
+	    return;
+	}
+
+	//  Create the field definition array.
+    $field = array(
+      'field_name' => $field_name,
+      'type' => 'image',
+      'module' => 'image',
+      'locked' => FALSE,
+      'cardinality' => FIELD_CARDINALITY_UNLIMITED,
+      'translatable' => FALSE,
+      'settings' => array(
+        'display_field' => 1,
+        'display_default' => variable_get('upload_list_default', 1),
+        'uri_scheme' => file_default_scheme(),
+        'default_file' => 0,
+      ),
+    );
+    field_create_field($field);
+
+	//  Create the field instance definition array.
+	$instance = array(
+        'label' => 'Image',
+        'widget' => array(
+          'weight' => '19',
+          'type' => 'image_image',
+          'module' => 'image',
+          'active' => 1,
+          'settings' => array(
+            'progress_indicator' => 'throbber',
+            'preview_image_style' => 'thumbnail',
+          ),
+        ),
+        'settings' => array(
+          'file_directory' => '',
+          'file_extensions' => 'png gif jpg jpeg',
+          'max_filesize' => '',
+          'max_resolution' => '',
+          'min_resolution' => '',
+          'alt_field' => 0,
+          'title_field' => 0,
+          'default_image' => 0,
+          'user_register_form' => FALSE,
+        ),
+        'display' => array(
+          'default' => array(
+            'label' => 'above',
+            'type' => 'image',
+            'settings' => array(
+              'image_style' => '',
+              'image_link' => '',
+            ),
+            'module' => 'image',
+          ),
+        ),
+        'required' => 0,
+        'description' => '',
+        'field_name' => 'field_di_image',
+        'entity_type' => 'node',
+        'bundle' => 'drupalionic',
+        'deleted' => '0',
+	);
+
+	//  Create an instance of the field and bind it to the bundle.
+	field_create_instance($instance);
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function drupalionic_uninstall() {
+  // Remove support content type.
+  node_type_delete('drupalionic');
+}
